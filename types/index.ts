@@ -1,3 +1,5 @@
+import type { FileType } from "../src/enums";
+
 export interface TrackMeta {
 	filePath: string;
 	title?: string;
@@ -6,7 +8,7 @@ export interface TrackMeta {
 	year?: number;
 	genre?: string;
 	trackNumber?: number;
-	format: "mp3" | "flac";
+	format: FileType;
 }
 
 export interface MissingField {

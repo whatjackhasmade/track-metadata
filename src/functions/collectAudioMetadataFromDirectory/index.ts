@@ -1,24 +1,28 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import type { TrackMeta } from "../../../types";
-import { readMetadata } from "..";
+import { FileType } from "../../enums";
+import { readMetadataFromFile } from "..";
 
-/** Audio file extensions supported for metadata extraction. */
-const SUPPORTED_AUDIO_EXTENSIONS = new Set([".mp3", ".flac"]);
+const supportedAudioFiles = [FileType.MP3, FileType.FLAC] as const;
+
+function isSupportedAudioFileType(
+	fileType: string,
+): fileType is (typeof supportedAudioFiles)[number] {
+	return (supportedAudioFiles as readonly string[]).includes(fileType);
+}
 
 /**
  * Recursively scans a directory and all subdirectories for supported audio
  * files (.mp3, .flac), reads their metadata, and returns the collected results.
  *
- * @param rootDir - Absolute or relative path to the directory to scan.
+ * @param rootDirectory - Absolute or relative path to the directory to scan.
  * @returns A promise that resolves to an array of {@link TrackMeta} objects,
  *   one per successfully parsed audio file.
  */
-export async function collectAudioMetadataFromDirectory(
-	rootDir: string,
-): Promise<TrackMeta[]> {
+export async function collectAudioMetadataFromDirectory(rootDirectory: string) {
 	const results: TrackMeta[] = [];
-	await recursivelyWalkDirectoryForAudioFiles(rootDir, results);
+	await recursivelyWalkDirectoryForAudioFiles(rootDirectory, results);
 	return results;
 }
 
@@ -30,28 +34,29 @@ export async function collectAudioMetadataFromDirectory(
  * concurrently via `Promise.all`; recursion into subdirectories is awaited
  * before the parent call resolves.
  *
- * @param dir - The directory to read during this invocation.
- * @param acc - Mutable accumulator array; matching {@link TrackMeta} entries
+ * @param directory - The directory to read during this invocation.
+ * @param accumulator - Mutable accumulator array; matching {@link TrackMeta} entries
  *   are pushed into it as they are resolved.
  */
 async function recursivelyWalkDirectoryForAudioFiles(
-	dir: string,
-	acc: TrackMeta[],
-): Promise<void> {
-	const entries = await fs.readdir(dir, { withFileTypes: true });
+	directory: string,
+	accumulator: TrackMeta[],
+) {
+	const entries = await fs.readdir(directory, { withFileTypes: true });
 
 	await Promise.all(
 		entries.map(async (entry) => {
-			const fullPath = path.join(dir, entry.name);
+			const fullPath = path.join(directory, entry.name);
 
 			if (entry.isDirectory()) {
-				await recursivelyWalkDirectoryForAudioFiles(fullPath, acc);
+				await recursivelyWalkDirectoryForAudioFiles(fullPath, accumulator);
 			} else if (entry.isFile()) {
-				const ext = path.extname(entry.name).toLowerCase();
+				const extension = path.extname(entry.name).toLowerCase();
+				const fileType = extension.split(".").at(-1) || "";
 
-				if (SUPPORTED_AUDIO_EXTENSIONS.has(ext)) {
-					const meta = await readMetadata(fullPath, ext as ".mp3" | ".flac");
-					if (meta) acc.push(meta);
+				if (isSupportedAudioFileType(fileType)) {
+					const meta = await readMetadataFromFile(fullPath, fileType);
+					if (meta) accumulator.push(meta);
 				}
 			}
 		}),

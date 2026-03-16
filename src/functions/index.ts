@@ -1,2 +1,2 @@
 export * from "./collectAudioMetadataFromDirectory";
-export * from "./readMetadata";
+export * from "./readMetadataFromFile";

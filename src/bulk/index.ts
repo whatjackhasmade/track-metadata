@@ -16,10 +16,7 @@ const editableFields: { value: EditableField; name: string }[] = [
 	{ value: "genre", name: "Genre" },
 ];
 
-async function write(
-	tracks: TrackMeta[],
-	updates: Partial<TrackMeta>,
-): Promise<void> {
+async function write(tracks: TrackMeta[], updates: Partial<TrackMeta>) {
 	const writeSpinner = ora("Writing tags...").start();
 	let success = 0;
 	let failed = 0;
@@ -42,7 +39,7 @@ async function write(
 	);
 }
 
-export async function bulkTag(directory: string): Promise<void> {
+export async function bulkTag(directory: string) {
 	console.clear();
 	console.log(chalk.bold.cyan("Bulk Tag Editor\n"));
 
@@ -90,7 +87,6 @@ export async function bulkTag(directory: string): Promise<void> {
 		(updates as Record<string, string | number>)[field] = value;
 	}
 
-	// 4. Summary + confirm
 	console.log(`\n${chalk.bold("Changes to apply:")}`);
 
 	for (const [key, val] of Object.entries(updates)) {
@@ -110,13 +106,10 @@ export async function bulkTag(directory: string): Promise<void> {
 		return;
 	}
 
-	// 5. Write
 	await write(tracks, updates);
 }
 
-async function promptFieldValue(
-	field: EditableField,
-): Promise<string | number> {
+async function promptFieldValue(field: EditableField) {
 	switch (field) {
 		case "genre": {
 			const genres = Object.values(Genre).map((genre) => ({
