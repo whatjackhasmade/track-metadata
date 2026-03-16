@@ -11,10 +11,7 @@ export async function writeFLAC(
 	if (updates.artist) updatedFile.tag.albumArtists = [updates.artist];
 	if (updates.title) updatedFile.tag.title = updates.title;
 	if (updates.year) updatedFile.tag.year = updates.year;
-	if (updates.genre)
-		updatedFile.tag.genres = updates.genre
-			.split(",")
-			.map((genre) => genre.trim());
+	if (updates.genre) updatedFile.tag.genres = [updates.genre];
 
 	updatedFile.save();
 }
