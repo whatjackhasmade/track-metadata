@@ -4,11 +4,15 @@
   "type": "module",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "music-meta": "./dist/index.js"
+  },
   "scripts": {
-    "build": "tsc",
     "bulk": "tsx src/index.ts bulk",
     "scan": "tsx src/index.ts scan",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --minify",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "whatjackhasmade",
@@ -16,7 +20,8 @@
   "devDependencies": {
     "@types/inquirer": "9.0.9",
     "@types/node": "25.5.0",
-    "tsx": "4.21.0",
+    "esbuild": "^0.27.4",
+    "tsx": "^4.21.0",
     "typescript": "5.9.3"
   },
   "dependencies": {
