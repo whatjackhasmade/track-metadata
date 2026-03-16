@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import ora from "ora";
-import { writeMetaDataToFile } from "@/functions";
+import { writeMetadataToFile } from "@/functions";
 import type { TrackMeta } from "@/types";
 
 /**
@@ -20,7 +20,7 @@ export async function applyTagWrites(
 
 	for (const track of tracks) {
 		try {
-			await writeMetaDataToFile(track, updates);
+			await writeMetadataToFile(track, updates);
 			success++;
 		} catch (err) {
 			// Pause the spinner so the warning prints on its own line,

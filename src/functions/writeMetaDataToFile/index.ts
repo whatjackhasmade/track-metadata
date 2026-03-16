@@ -17,9 +17,9 @@ import { writeMP3 } from "./writeMP3";
  * @see {@link writeFLAC} for FLAC tag writing.
  *
  * @example
- * await writeMetaDataToFile(track, { title: "Echoes", year: 1971 });
+ * await writeMetadataToFile(track, { title: "Echoes", year: 1971 });
  */
-export async function writeMetaDataToFile(
+export async function writeMetadataToFile(
 	track: Pick<TrackMeta, "filePath" | "format">,
 	updates: Partial<TrackMeta>,
 ) {
