@@ -3,7 +3,7 @@ import { checkbox, confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import ora from "ora";
 import type { TrackMeta } from "@/types";
-import { collectAudioMetadataFromDirectory } from "../functions";
+import { collectAudioMetadataFromDirectory } from "@/utils";
 import { applyTagWrites, editableFields, promptFieldValue } from "./functions";
 
 type EditableField = keyof Omit<TrackMeta, "filePath" | "format">;

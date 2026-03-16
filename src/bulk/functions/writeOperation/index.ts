@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import ora from "ora";
-import { writeMetadataToFile } from "@/functions";
 import type { TrackMeta } from "@/types";
+import { writeMetadataToFile } from "@/utils";
 
 /**
  * Writes metadata updates to a collection of audio tracks, reporting
