@@ -8,7 +8,7 @@ import { applyTagWrites, editableFields, promptFieldValue } from "./functions";
 
 type EditableField = keyof Omit<TrackMeta, "filePath" | "format">;
 
-export async function bulkTag(directory: string): Promise<void> {
+export async function bulkTag(directory: string) {
 	console.clear();
 	console.log(chalk.bold.cyan("Bulk Tag Editor\n"));
 
