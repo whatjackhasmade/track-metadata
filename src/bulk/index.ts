@@ -1,45 +1,14 @@
 import * as path from "node:path";
-import { checkbox, confirm, input } from "@inquirer/prompts";
+import { checkbox, confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import ora from "ora";
 import type { TrackMeta } from "../../types";
-import { Genre } from "../enums/genres";
 import { collectAudioMetadataFromDirectory } from "../functions";
-import { writeMeta } from "../writer";
+import { applyTagWrites, editableFields, promptFieldValue } from "./functions";
 
 type EditableField = keyof Omit<TrackMeta, "filePath" | "format">;
 
-const editableFields: { value: EditableField; name: string }[] = [
-	{ value: "album", name: "Album" },
-	{ value: "artist", name: "Artist" },
-	{ value: "year", name: "Year" },
-	{ value: "genre", name: "Genre" },
-];
-
-async function write(tracks: TrackMeta[], updates: Partial<TrackMeta>) {
-	const writeSpinner = ora("Writing tags...").start();
-	let success = 0;
-	let failed = 0;
-
-	for (const track of tracks) {
-		try {
-			await writeMeta(track, updates);
-			success++;
-		} catch (err) {
-			writeSpinner.stop();
-			console.warn(chalk.red(`✗ ${track.filePath}: ${(err as Error).message}`));
-			writeSpinner.start("Writing tags...");
-			failed++;
-		}
-	}
-
-	writeSpinner.succeed(
-		`Done — ${chalk.green(`${success} updated`)}` +
-			(failed > 0 ? chalk.red(`, ${failed} failed`) : ""),
-	);
-}
-
-export async function bulkTag(directory: string) {
+export async function bulkTag(directory: string): Promise<void> {
 	console.clear();
 	console.log(chalk.bold.cyan("Bulk Tag Editor\n"));
 
@@ -52,99 +21,56 @@ export async function bulkTag(directory: string) {
 		return;
 	}
 
-	const artists = new Set(tracks.map((track) => track.artist).filter(Boolean));
-	const albums = new Set(tracks.map((track) => track.album).filter(Boolean));
-	const years = new Set(tracks.map((track) => track.year).filter(Boolean));
-	const genres = new Set(tracks.map((track) => track.genre).filter(Boolean));
-
-	console.log(chalk.dim(`Unique values across all ${tracks.length} files:`));
-	console.log(
-		`${chalk.cyan("Artists:")} ${[...artists].join("; ") || chalk.dim("N/A")}`,
-	);
-	console.log(
-		`${chalk.cyan("Albums:")} ${[...albums].join("; ") || chalk.dim("N/A")}`,
-	);
-	console.log(
-		`${chalk.cyan("Years:")} ${[...years].join("; ") || chalk.dim("N/A")}`,
-	);
-	console.log(
-		`${chalk.cyan("Genres:")} ${[...genres].join("; ") || chalk.dim("N/A")}`,
-	);
-
-	console.log("\n------------------------------------\n");
+	printSummary(tracks);
 
 	const selectedFields = await checkbox({
 		message: "Which fields do you want to set?",
 		choices: editableFields,
-		validate: (value) => value.length > 0 || "Select at least one field",
+		validate: (value) => !!value.length || "Select at least one field",
 	});
 
 	const updates: Partial<TrackMeta> = {};
-
 	for (const field of selectedFields as EditableField[]) {
-		const value = await promptFieldValue(field);
-		// Ensure value is string or number, and cast to the correct type
-		(updates as Record<string, string | number>)[field] = value;
+		(updates as Record<string, string | number>)[field] =
+			await promptFieldValue(field);
 	}
 
-	console.log(`\n${chalk.bold("Changes to apply:")}`);
-
-	for (const [key, val] of Object.entries(updates)) {
-		console.log(`${chalk.cyan(key)}: ${chalk.yellow(String(val))}`);
-	}
-
-	console.log(
-		`\n${chalk.bold("To all")} ${chalk.cyan(String(tracks.length))} files in:`,
-	);
-
-	console.log(`${chalk.dim(path.resolve(directory))}\n`);
+	printConfirmation(updates, tracks.length, directory);
 
 	const confirmed = await confirm({ message: "Apply?", default: false });
-
 	if (!confirmed) {
 		console.log(chalk.dim("Cancelling bulk tag operation."));
 		return;
 	}
 
-	await write(tracks, updates);
+	await applyTagWrites(tracks, updates);
 }
 
-async function promptFieldValue(field: EditableField) {
-	switch (field) {
-		case "genre": {
-			const genres = Object.values(Genre).map((genre) => ({
-				name: genre,
-				value: genre,
-			}));
+function uniqueValues<T extends TrackMeta>(tracks: T[], key: keyof T) {
+	const uniqueSet = new Set(tracks.map((track) => track[key]).filter(Boolean));
+	return uniqueSet.size ? [...uniqueSet].join("; ") : chalk.dim("N/A");
+}
 
-			const selectedGenres = await checkbox({
-				message: "What genres do you want to apply?",
-				choices: genres,
-				validate: (value) => value.length > 0 || "Select at least one genre",
-			});
+function printSummary(tracks: TrackMeta[]): void {
+	console.log(chalk.dim(`Unique values across all ${tracks.length} files:`));
+	console.log(`${chalk.cyan("Artists:")} ${uniqueValues(tracks, "artist")}`);
+	console.log(`${chalk.cyan("Albums:")}  ${uniqueValues(tracks, "album")}`);
+	console.log(`${chalk.cyan("Years:")}   ${uniqueValues(tracks, "year")}`);
+	console.log(`${chalk.cyan("Genres:")}  ${uniqueValues(tracks, "genre")}`);
+	console.log("\n------------------------------------\n");
+}
 
-			return selectedGenres.sort().join(", ");
-		}
-		case "trackNumber": {
-			const raw = await input({
-				message: "Track number:",
-				validate: (value) => /^\d+$/.test(value) || "Enter a valid number",
-			});
-			return parseInt(raw, 10);
-		}
-		case "year": {
-			const raw = await input({
-				message: "Year:",
-				validate: (value) =>
-					/^\d{4}$/.test(value) || "Enter a valid 4-digit year",
-			});
-			return parseInt(raw, 10);
-		}
-		default: {
-			return await input({
-				message: `${field.charAt(0).toUpperCase() + field.slice(1)}:`,
-				validate: (value) => value.trim().length > 0 || "Cannot be empty",
-			});
-		}
+function printConfirmation(
+	updates: Partial<TrackMeta>,
+	count: number,
+	directory: string,
+): void {
+	console.log(`\n${chalk.bold("Changes to apply:")}`);
+	for (const [key, val] of Object.entries(updates)) {
+		console.log(`  ${chalk.cyan(key)}: ${chalk.yellow(String(val))}`);
 	}
+	console.log(
+		`\n${chalk.bold("To all")} ${chalk.cyan(String(count))} files in:`,
+	);
+	console.log(`${chalk.dim(path.resolve(directory))}\n`);
 }
