@@ -1,5 +1,5 @@
 import { parseFile } from "music-metadata";
-import type { FileType } from "../../enums";
+import type { FileType } from "@/enums";
 
 /**
  * Reads and normalises metadata from an audio file.

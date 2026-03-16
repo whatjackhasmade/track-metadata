@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "target": "ESNext",
-    "module": "ESNext",            // Must be ES2015 or later to use 'Bundler'
-    "moduleResolution": "Bundler", // Tells TS: "A bundler will handle the file lookups for me"
-    "allowImportingTsExtensions": true, // Optional: if you want to use .ts extensions
-    "noEmit": true,                // Usually used when a bundler (not tsc) handles the output
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true

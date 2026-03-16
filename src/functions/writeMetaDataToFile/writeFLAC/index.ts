@@ -1,5 +1,5 @@
 import { File } from "node-taglib-sharp";
-import type { TrackMeta } from "../../../types";
+import type { TrackMeta } from "@/types";
 
 /**
  * Writes metadata tags to a FLAC audio file.

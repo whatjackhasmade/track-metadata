@@ -1,7 +1,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import type { TrackMeta } from "../../../types";
-import { FileType } from "../../enums";
+import { FileType } from "@/enums";
+import type { TrackMeta } from "@/types";
 import { readMetadataFromFile } from "..";
 
 const supportedAudioFiles = [FileType.MP3, FileType.FLAC] as const;

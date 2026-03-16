@@ -1,6 +1,6 @@
 import { checkbox, input } from "@inquirer/prompts";
-import type { TrackMeta } from "../../../../types";
-import { Genre } from "../../../enums/genres";
+import { Genre } from "@/enums";
+import type { TrackMeta } from "@/types";
 
 type EditableField = keyof Omit<TrackMeta, "filePath" | "format">;
 

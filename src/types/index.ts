@@ -1,4 +1,4 @@
-import type { FileType } from "../src/enums";
+import type { FileType } from "@/enums";
 
 export interface TrackMeta {
 	filePath: string;

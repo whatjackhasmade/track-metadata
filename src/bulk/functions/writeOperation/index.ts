@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import ora from "ora";
-import type { TrackMeta } from "../../../../types";
-import { writeMeta } from "../../../writer";
+import { writeMetaDataToFile } from "@/functions";
+import type { TrackMeta } from "@/types";
 
 /**
  * Writes metadata updates to a collection of audio tracks, reporting
@@ -20,7 +20,7 @@ export async function applyTagWrites(
 
 	for (const track of tracks) {
 		try {
-			await writeMeta(track, updates);
+			await writeMetaDataToFile(track, updates);
 			success++;
 		} catch (err) {
 			// Pause the spinner so the warning prints on its own line,

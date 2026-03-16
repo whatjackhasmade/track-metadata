@@ -1,5 +1,5 @@
 import NodeID3 from "node-id3";
-import type { TrackMeta } from "../../../types";
+import type { TrackMeta } from "@/types";
 
 /**
  * Writes ID3 tags to an MP3 audio file.

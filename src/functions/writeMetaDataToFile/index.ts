@@ -1,5 +1,5 @@
-import type { TrackMeta } from "../../types";
-import { FileType } from "../enums";
+import { FileType } from "@/enums";
+import type { TrackMeta } from "@/types";
 import { writeFLAC } from "./writeFLAC";
 import { writeMP3 } from "./writeMP3";
 
@@ -17,9 +17,9 @@ import { writeMP3 } from "./writeMP3";
  * @see {@link writeFLAC} for FLAC tag writing.
  *
  * @example
- * await writeMeta(track, { title: "Echoes", year: 1971 });
+ * await writeMetaDataToFile(track, { title: "Echoes", year: 1971 });
  */
-export async function writeMeta(
+export async function writeMetaDataToFile(
 	track: Pick<TrackMeta, "filePath" | "format">,
 	updates: Partial<TrackMeta>,
 ) {
