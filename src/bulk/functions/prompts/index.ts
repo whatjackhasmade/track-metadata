@@ -16,29 +16,33 @@ export async function promptFieldValue(field: EditableField) {
 		case "genre": {
 			const selected = await checkbox({
 				message: "What genres do you want to apply?",
-				choices: Object.values(Genre).map((g) => ({ name: g, value: g })),
-				validate: (v) => v.length > 0 || "Select at least one genre",
+				choices: Object.values(Genre).map((genre) => ({
+					name: genre,
+					value: genre,
+				})),
+				validate: (value) => value.length > 0 || "Select at least one genre",
 			});
 			return selected.sort().join(", ");
 		}
 		case "trackNumber": {
-			const raw = await input({
+			const inputValue = await input({
 				message: "Track number:",
-				validate: (v) => /^\d+$/.test(v) || "Enter a valid number",
+				validate: (value) => /^\d+$/.test(value) || "Enter a valid number",
 			});
-			return parseInt(raw, 10);
+			return parseInt(inputValue, 10);
 		}
 		case "year": {
-			const raw = await input({
+			const inputValue = await input({
 				message: "Year:",
-				validate: (v) => /^\d{4}$/.test(v) || "Enter a valid 4-digit year",
+				validate: (value) =>
+					/^\d{4}$/.test(value) || "Enter a valid 4-digit year",
 			});
-			return parseInt(raw, 10);
+			return parseInt(inputValue, 10);
 		}
 		default: {
 			return input({
 				message: `${field.charAt(0).toUpperCase() + field.slice(1)}:`,
-				validate: (v) => v.trim().length > 0 || "Cannot be empty",
+				validate: (value) => value.trim().length > 0 || "Cannot be empty",
 			});
 		}
 	}
