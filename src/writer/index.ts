@@ -1,8 +1,8 @@
 import * as fs from "node:fs";
 import * as fsPromises from "node:fs/promises";
 import * as NodeID3 from "node-id3";
+import type { TrackMeta } from "../../types";
 import { type MetaDataBlock, Processor } from "../flac-metadata";
-import type { TrackMeta } from "../types";
 
 export async function writeMeta(
 	track: TrackMeta,

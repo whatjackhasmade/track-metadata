@@ -2,6 +2,7 @@ export class MetaDataBlock {
 	public error: Error | null = null;
 	public hasData: boolean = false;
 	public removed: boolean = false;
+	public comments: string[] = [];
 
 	constructor(
 		public isLast: boolean,
