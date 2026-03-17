@@ -4,27 +4,17 @@ A CLI tool for reading and writing metadata tags on MP3 and FLAC files.
 
 ## Installation
 
-```bash
-npm install
-npm run build
-```
-
-To install globally:
+### Global Install (Recommended)
+To use the tool from anywhere on your system, install it directly from npm:
 
 ```bash
-npm install -g .
+npm install -g @wjhm/music-meta
 ```
 
 ## Usage
 
 ```bash
 music-meta <command> [options]
-```
-
-Or run directly without installing:
-
-```bash
-node ./dist/index.js <command> [options]
 ```
 
 ## Commands
@@ -35,9 +25,6 @@ Interactively apply a set of tags to all MP3/FLAC files in a directory.
 
 ```bash
 music-meta bulk "Music/Laid Out - EP"
-
-# Or without global install
-node ./dist/index.js bulk "Music/Laid Out - EP"
 ```
 
 You will be prompted to enter the tag values you want to apply across all files in the directory.
@@ -50,10 +37,6 @@ npm run dev -- bulk "Music/Laid Out - EP"
 
 # Or use the named scripts
 npm run bulk "Music/Laid Out - EP"
-npm run scan "Music/Laid Out - EP"
-
-# Type-check without emitting
-npm run typecheck
 
 # Build for production
 npm run build
@@ -66,7 +49,7 @@ npm run build
 | `npm run dev` | Run the CLI via `tsx` (no build needed) |
 | `npm run bulk` | Shorthand for `tsx src/index.ts bulk` |
 | `npm run scan` | Shorthand for `tsx src/index.ts scan` |
-| `npm run build` | Bundle and minify to `dist/index.js` via esbuild |
+| `npm run build` | Bundle and minify to `dist/index.cjs` via esbuild |
 | `npm run typecheck` | Type-check with `tsc` (no emit) |
 
 ## Tech Stack
