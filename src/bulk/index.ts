@@ -48,7 +48,7 @@ export async function bulkTag(directory: string) {
 
 function uniqueValues<T extends TrackMeta>(tracks: T[], key: keyof T) {
 	const uniqueSet = new Set(tracks.map((track) => track[key]).filter(Boolean));
-	return uniqueSet.size ? [...uniqueSet].join("; ") : chalk.dim("N/A");
+	return uniqueSet.size ? Array.from(uniqueSet).join("; ") : chalk.dim("N/A");
 }
 
 function printSummary(tracks: TrackMeta[]): void {

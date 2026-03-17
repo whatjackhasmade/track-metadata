@@ -11,20 +11,27 @@ if (existsSync(distPath)) {
 mkdirSync(distPath);
 
 // 2. Run the build
-await esbuild.build({
-	entryPoints: ["src/index.ts"],
-	bundle: true,
-	platform: "node",
-	format: "cjs",
-	outfile: "dist/index.cjs", // Your desired CJS output
-	minifySyntax: true,
-	minifyWhitespace: true,
-	minifyIdentifiers: true,
-	sourcemap: true,
-	alias: { "@": "./src" },
-	banner: {
-		js: "#!/usr/bin/env node",
-	},
-});
-
-console.log("Build complete: dist/index.cjs");
+(async () => {
+	await esbuild.build({
+		entryPoints: ["src/index.ts"],
+		bundle: true,
+		platform: "node",
+		format: "cjs",
+		outfile: "dist/index.cjs", // Your desired CJS output
+		minifySyntax: true,
+		minifyWhitespace: true,
+		minifyIdentifiers: true,
+		sourcemap: true,
+		alias: { "@": "./src" },
+		banner: {
+			js: "#!/usr/bin/env node",
+		},
+	});
+})()
+	.then(() => {
+		console.log("Build complete: dist/index.cjs");
+	})
+	.catch((err) => {
+		console.error("Build failed:", err);
+		process.exit(1);
+	});

@@ -28,7 +28,7 @@
     "scan": "tsx --tsconfig tsconfig.json src/index.ts scan",
     "dev": "tsx --tsconfig tsconfig.json src/index.ts",
     "typecheck": "tsc --noEmit",
-    "build": "tsx build.ts",
+    "build": "npm run typecheck && tsx build.ts",
     "prepublishOnly": "npm run build",
     "postbuild": "chmod +x dist/index.cjs"
   },

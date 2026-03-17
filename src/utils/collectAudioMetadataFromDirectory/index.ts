@@ -52,7 +52,8 @@ async function recursivelyWalkDirectoryForAudioFiles(
 				await recursivelyWalkDirectoryForAudioFiles(fullPath, accumulator);
 			} else if (entry.isFile()) {
 				const extension = path.extname(entry.name).toLowerCase();
-				const fileType = extension.split(".").at(-1) || "";
+				const splitExt = extension.split(".");
+				const fileType = splitExt.length ? splitExt[splitExt.length - 1] : "";
 
 				if (isSupportedAudioFileType(fileType)) {
 					const meta = await readMetadataFromFile(fullPath, fileType);
