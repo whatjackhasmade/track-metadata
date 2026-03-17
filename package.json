@@ -8,7 +8,7 @@
     "music-meta": "dist/index.cjs"
   },
   "files": [
-    "dist"
+    "dist/index.cjs"
   ],
   "engines": {
     "node": ">=18"
