@@ -1,10 +1,11 @@
 {
+  "type": "module",
   "name": "@wjhm/music-meta",
   "version": "0.2.1",
   "description": "CLI tool to bulk-edit MP3/FLAC metadata tags",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "bin": {
-    "music-meta": "dist/index.js"
+    "music-meta": "dist/index.cjs"
   },
   "files": [
     "dist"
@@ -26,10 +27,10 @@
     "bulk": "tsx --tsconfig tsconfig.json src/index.ts bulk",
     "scan": "tsx --tsconfig tsconfig.json src/index.ts scan",
     "dev": "tsx --tsconfig tsconfig.json src/index.ts",
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --minify --external:node-taglib-sharp --alias:@=./src",
     "typecheck": "tsc --noEmit",
+    "build": "tsx build.ts",
     "prepublishOnly": "npm run build",
-    "postbuild": "chmod +x dist/index.js"
+    "postbuild": "chmod +x dist/index.cjs"
   },
   "devDependencies": {
     "@types/inquirer": "9.0.9",
