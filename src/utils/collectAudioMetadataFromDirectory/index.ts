@@ -1,5 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import { ErrorMessage } from "@/enums";
 import type { TrackMeta } from "@/types";
 import { getMetadataForDirectoryEntry } from "../getMetadataForDirectoryEntry";
 
@@ -43,12 +44,20 @@ async function recursivelyWalkDirectoryForAudioFiles(
 				await recursivelyWalkDirectoryForAudioFiles(fullPath, accumulator);
 			} else if (directoryEntry.isFile()) {
 				try {
-					const meta = await getMetadataForDirectoryEntry(directoryEntry);
-					if (meta) {
-						accumulator.push(meta);
-					} else {
-						console.warn(`Skipping ${fullPath}: No metadata read`);
-					}
+					const metadata = await getMetadataForDirectoryEntry(
+						directoryEntry,
+					).match(
+						(data) => data,
+						(error) => {
+							// We don't want to spam the console with unsupported file type warnings, but we do want to log other errors
+							if (!error.message.startsWith(ErrorMessage.UnsupportedFileType))
+								console.warn(
+									`Skipping ${fullPath}: ${(error as Error).message}`,
+								);
+						},
+					);
+
+					if (metadata) accumulator.push(metadata);
 				} catch (error) {
 					// Log and skip unsupported file types or read errors
 					console.warn(`Skipping ${fullPath}: ${(error as Error).message}`);

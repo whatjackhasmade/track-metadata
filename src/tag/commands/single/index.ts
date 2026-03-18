@@ -18,16 +18,21 @@ export async function singleTag(filePath: string) {
 
 	const spinner = ora(`Looking for ${filePath}...`).start();
 
-	const metadata = await getMetadataForFile(filePath);
+	const metadata = await getMetadataForFile(filePath).match(
+		(data) => data,
+		(error) => {
+			spinner.fail(`${chalk.red("Failed:")} ${error.message}`);
+			process.exit(1);
+		},
+	);
 
-	if (metadata.isErr()) {
-		spinner.fail(`${chalk.red("Failed:")} ${metadata.error.message}`);
+	if (!metadata) {
 		return;
 	}
 
-	spinner.succeed(`Found ${chalk.bold(filePath)} MP3/FLAC files`);
+	spinner.succeed(`Loaded ${chalk.bold(path.basename(filePath))}`);
 
-	printSummary(metadata.value);
+	printSummary(metadata, filePath);
 
 	const selectedFields = await checkbox({
 		message: "Which fields do you want to set?",
@@ -50,11 +55,11 @@ export async function singleTag(filePath: string) {
 		return;
 	}
 
-	await applyTagWrites(metadata.value, updates);
+	await applyTagWrites(metadata, updates);
 }
 
-function printSummary(track: TrackMeta) {
-	console.log(chalk.dim(`Unique values across all files:`));
+function printSummary(track: TrackMeta, filePath: string) {
+	console.log(chalk.dim(`Current tags for ${path.basename(filePath)}:`));
 	console.log(`${chalk.cyan("Artists:")} ${track.artist || chalk.dim("N/A")}`);
 	console.log(`${chalk.cyan("Albums:")}  ${track.album || chalk.dim("N/A")}`);
 	console.log(`${chalk.cyan("Years:")}   ${track.year || chalk.dim("N/A")}`);
