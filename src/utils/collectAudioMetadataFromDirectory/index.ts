@@ -1,16 +1,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { FileType } from "@/enums";
 import type { TrackMeta } from "@/types";
-import { readMetadataFromFile } from "..";
-
-const supportedAudioFiles = [FileType.MP3, FileType.FLAC] as const;
-
-function isSupportedAudioFileType(
-	fileType: string,
-): fileType is (typeof supportedAudioFiles)[number] {
-	return (supportedAudioFiles as readonly string[]).includes(fileType);
-}
+import { getMetadataForDirectoryEntry } from "../getMetadataForDirectoryEntry";
 
 /**
  * Recursively scans a directory and all subdirectories for supported audio
@@ -45,19 +36,22 @@ async function recursivelyWalkDirectoryForAudioFiles(
 	const entries = await fs.readdir(directory, { withFileTypes: true });
 
 	await Promise.all(
-		entries.map(async (entry) => {
-			const fullPath = path.join(directory, entry.name);
+		entries.map(async (directoryEntry) => {
+			const fullPath = path.join(directory, directoryEntry.name);
 
-			if (entry.isDirectory()) {
+			if (directoryEntry.isDirectory()) {
 				await recursivelyWalkDirectoryForAudioFiles(fullPath, accumulator);
-			} else if (entry.isFile()) {
-				const extension = path.extname(entry.name).toLowerCase();
-				const splitExt = extension.split(".");
-				const fileType = splitExt.length ? splitExt[splitExt.length - 1] : "";
-
-				if (isSupportedAudioFileType(fileType)) {
-					const meta = await readMetadataFromFile(fullPath, fileType);
-					if (meta) accumulator.push(meta);
+			} else if (directoryEntry.isFile()) {
+				try {
+					const meta = await getMetadataForDirectoryEntry(directoryEntry);
+					if (meta) {
+						accumulator.push(meta);
+					} else {
+						console.warn(`Skipping ${fullPath}: No metadata read`);
+					}
+				} catch (error) {
+					// Log and skip unsupported file types or read errors
+					console.warn(`Skipping ${fullPath}: ${(error as Error).message}`);
 				}
 			}
 		}),

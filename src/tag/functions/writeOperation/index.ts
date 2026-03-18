@@ -11,12 +11,16 @@ import { writeMetadataToFile } from "@/utils";
  * @param updates - Partial metadata fields to overwrite; only provided keys are written.
  */
 export async function applyTagWrites(
-	tracks: TrackMeta[],
+	tracks: TrackMeta[] | TrackMeta,
 	updates: Partial<TrackMeta>,
 ) {
 	const spinner = ora("Writing tags...").start();
 	let success = 0;
 	let failed = 0;
+
+	if (!Array.isArray(tracks)) {
+		tracks = [tracks];
+	}
 
 	for (const track of tracks) {
 		try {

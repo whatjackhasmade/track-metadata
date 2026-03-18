@@ -4,7 +4,11 @@ import chalk from "chalk";
 import ora from "ora";
 import type { TrackMeta } from "@/types";
 import { collectAudioMetadataFromDirectory } from "@/utils";
-import { applyTagWrites, editableFields, promptFieldValue } from "./functions";
+import {
+	applyTagWrites,
+	editableFields,
+	promptFieldValue,
+} from "../../functions";
 
 type EditableField = keyof Omit<TrackMeta, "filePath" | "format">;
 

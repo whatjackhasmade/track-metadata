@@ -1,17 +1,11 @@
 import { program } from "commander";
-import { bulkTag } from "./bulk";
+import { bulkTag, singleTag } from "./tag";
 
-// program
-// 	.name("music-meta")
-// 	.command("scan <directory>")
-// 	.description("Scan for files missing metadata fields")
-// 	.option(
-// 		"-f, --fields <fields>",
-// 		"Comma-separated fields to check for",
-// 		"year",
-// 	)
-// 	.option("--dry-run", "List missing files without prompting")
-// 	.action(scan);
+program
+	.name("music-meta")
+	.command("update <directory>")
+	.description("Apply a set of tags to a single MP3/FLAC file")
+	.action(singleTag);
 
 program
 	.command("bulk <directory>")
